@@ -24,6 +24,8 @@ class Gui extends JFrame implements View{
 
     private final Controller controller;
 
+    private final Font font = new Font("Serif", Font.PLAIN, 20);
+
     private final String HEADER  = "Словарные слова";
     //private final JTextField    task = new JTextField(" ",10 );
     private final JTextArea textArea = new JTextArea(   "Ошибки" + " :\n\n"  );
@@ -48,25 +50,17 @@ class Gui extends JFrame implements View{
      * setup GUI
      */
     Gui(Controller controller) {
+        this.controller = controller;
 
         // main window settings
         setTitle(HEADER);
         double RATIO = 0.5625;
-        int x = 400;
+        int x = 500;
         setBounds( 50 , 50 , x , (int)(x / RATIO)  );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        this.controller = controller;
-
         // prevent editiong of result text field
         textArea.setEditable(false);
-
-        //task.setFont(new Font(null , "Monospace" , 10));
-        //task.setMaximumSize(new Dimension(10,1));
-        //task.setMinimumSize(new Dimension(10,1));
-        //task.addKeyListener(new LimitEnter());
-
-        //createAskPanel("гр  пфр т");
 
         // set result text field scrollable
         JScrollPane jsp = new JScrollPane(textArea);
@@ -75,6 +69,8 @@ class Gui extends JFrame implements View{
         // create button "Решить"
         button = new JButton("Ответ");
 
+        //JPanel emptyPanel = new JPanel();
+
         // create margins using empty panels in all sides except center
         JPanel north = new JPanel();
         JPanel west  = new JPanel();
@@ -82,34 +78,45 @@ class Gui extends JFrame implements View{
         JPanel south = new JPanel();
 
 
+        // south status bar
+        GridLayout gridLayoutSouth = new GridLayout(1,2);
+        inArow.setHorizontalAlignment(JLabel.CENTER);
+         total.setHorizontalAlignment(JLabel.CENTER);
+        south.setLayout( gridLayoutSouth );
         south.add(inArow);
         south.add(total);
 
         // create panel for task and button
         innerNorth = new JPanel();
-
-
         input = controller.newTask();
         askPanel = createAskPanel( input );
         hint = controller.getHint();
 
         hintLabel = new JLabel(hint);
+        hintLabel.setFont(font);
 
         // put task and button to inner pane
         // TODO
         //  choose layout for task pane
 
-        innerNorth.setLayout( new GridLayout(1,3) );
-        innerNorth.add( askPanel  );
-        innerNorth.add( hintLabel );
-        innerNorth.add(button );
+        //FlowLayout topLayout = new FlowLayout();
+        BorderLayout topLayout = new BorderLayout();
+        //topLayout.setAlignment(FlowLayout.RIGHT);
+
+        innerNorth.setLayout( topLayout );
+
+        innerNorth.add( askPanel , BorderLayout.BEFORE_LINE_BEGINS );
+        innerNorth.add( hintLabel , BorderLayout.CENTER );
+        innerNorth.add(button , BorderLayout.LINE_END  );
 
         // fill north pane with inner pane and empty panes for margins
-        //north.setLayout( new BorderLayout() );
-        north.add(innerNorth);
+
+        north.setLayout( new BorderLayout() );
+        north.add(innerNorth , BorderLayout.CENTER);
         north.add(new JPanel() , BorderLayout.WEST);
-        //north.add(new JPanel() , BorderLayout.EAST);
+        north.add(new JPanel() , BorderLayout.EAST);
         north.add(new JPanel() , BorderLayout.NORTH);
+
 
         // put all in main frame
         add(north , BorderLayout.NORTH);
@@ -122,7 +129,6 @@ class Gui extends JFrame implements View{
         // create Action Listener and set it to button and task field key ENTER
         // action must be performed in new Thread , not in EventQueue
         ActionListener actionListener = new ButtonAction();
-
         button.addActionListener( actionListener );
         button.addKeyListener  ( new SwapFocusField() );
 
@@ -155,24 +161,33 @@ class Gui extends JFrame implements View{
 
 
 
-        System.out.println( concatAnswer());
+        //System.out.println( concatAnswer());
 
         // append text area
         if( isPanelFilled() ) {
             if (controller.action( concatAnswer() ) ){
 
-                total.setText(String.valueOf(++correct));
+                SwingUtilities.invokeLater( () -> {
+                    total.setText(String.valueOf(++correct));
 
-                if(isLandslide){
+                    //if(isLandslide){
                     inArow.setText(String.valueOf(++landslide));
-                }
+                    //}
+                    //isLandslide = true;
 
+                    revalidate();
+                });
             }
             else{
-                isLandslide = false;
-                String result = textArea.getText() + "\n" + input ;
+                //isLandslide = false;
+                landslide = 0;
+                String result = textArea.getText() + "\n" + input.replaceAll("@" , "_") ;
 
-                SwingUtilities.invokeLater( () -> textArea.setText(result) );
+                SwingUtilities.invokeLater( () -> {
+                    textArea.setText(result);
+                    inArow.setText(String.valueOf(landslide));
+                    revalidate();
+                });
 
             }
 
@@ -184,10 +199,10 @@ class Gui extends JFrame implements View{
                 input = controller.newTask();
                 askPanel = createAskPanel( input);
                 hint = controller.getHint();
-                System.out.println("new task");
+                //System.out.println("new task");
                 hintLabel.setText(hint);
 
-                innerNorth.add( askPanel ,0);
+                innerNorth.add( askPanel ,BorderLayout.BEFORE_LINE_BEGINS);
                 //innerNorth.add(new JLabel(hint), BorderLayout.CENTER);
                 innerNorth.revalidate();
 
@@ -245,6 +260,7 @@ class Gui extends JFrame implements View{
             if(part.equals("_")){
 
                 OneSimbolTextField field = new OneSimbolTextField();
+                field.setFont(font);
                 //if( gaps.size()==1 ) field.requestFocusInWindow();
                 field.addKeyListener(new SwapFocusField());
                 gaps.add(field);
@@ -254,7 +270,9 @@ class Gui extends JFrame implements View{
 
             }
             else {
-                result.add(new JLabel(part));
+                JLabel label = new JLabel(part);
+                label.setFont(font);
+                result.add(label);
 
             }
         }
@@ -303,27 +321,52 @@ class Gui extends JFrame implements View{
         @Override
         public void keyTyped(KeyEvent e){
 
+            char c = e.getKeyChar();
+
+
             if(e.getComponent().getClass().isInstance(new OneSimbolTextField())) {
                 OneSimbolTextField textField = (OneSimbolTextField) e.getSource();
                 String text = textField.getText();
-                char c = e.getKeyChar();
+
 
                 if (!((c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE)) && text.length() == 1) {
 
-                    for (int i = 0; i < gaps.size(); i++) {
-                        if (textField == gaps.get(i)) {
-                            if (i < gaps.size() - 1) gaps.get(i + 1).requestFocusInWindow();
-                            else button.requestFocusInWindow();
-                        }
-                    }
+                    focuceRight(textField);
                 }
 
             }
+
+//            if(c == KeyEvent.VK_LEFT ){
+//                if( e.getSource() == button ) {gaps.get( gaps.size()-1).requestFocusInWindow();}
+//                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
+//                    focuceLeft( (OneSimbolTextField) e.getSource()  );
+//                }
+//            }
+//            if(c == KeyEvent.VK_RIGHT ){
+//                if( e.getSource() == gaps.get( gaps.size()-1) ) {button.requestFocusInWindow();}
+//                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
+//                    focuceRight( (OneSimbolTextField) e.getSource()  );
+//                }
+//            }
+
+
 
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
+
+//            char c = e.getKeyChar();
+//            if( e.getSource().getClass().isInstance(  new OneSimbolTextField()) ) {
+//                OneSimbolTextField textField = (OneSimbolTextField) e.getSource();
+//
+//                if (c == KeyEvent.VK_LEFT) {
+//                    focuceLeft(textField);
+//                }
+//                if (c == KeyEvent.VK_RIGHT) {
+//                    focuceRight(textField);
+//                }
+//            }
 
         }
 
@@ -339,6 +382,23 @@ class Gui extends JFrame implements View{
             }
 
         }
+
+        private void focuceRight( OneSimbolTextField textField ){
+
+            for (int i = 0; i < gaps.size(); i++) {
+                if (textField == gaps.get(i)) {
+                    if (i < gaps.size() - 1) gaps.get(i + 1).requestFocusInWindow();
+                    else button.requestFocusInWindow();
+                }
+            }
+        }
+        private void focuceLeft( OneSimbolTextField textField ){
+
+            for (int i = 1; i < gaps.size(); i++) {
+                if (textField == gaps.get(i)) { gaps.get(i - 1).requestFocusInWindow(); }
+            }
+        }
+
     }
 
 
