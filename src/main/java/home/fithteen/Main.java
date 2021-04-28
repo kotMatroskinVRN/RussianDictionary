@@ -34,7 +34,7 @@ public class Main {
 //        }
 
 
-        ControllerGUI controllerGUI = new ControllerGUI(model);
+        Controller controllerGUI = new ControllerGUI(model);
 
         SwingUtilities.invokeLater(() -> new Gui(controllerGUI));
 

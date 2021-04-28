@@ -56,7 +56,7 @@ class Gui extends JFrame implements View{
         setTitle(HEADER);
         double RATIO = 0.5625;
         int x = 500;
-        setBounds( 50 , 50 , x , (int)(x / RATIO)  );
+        setBounds( 350 , 50 , x , (int)(x / RATIO)  );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // prevent editiong of result text field
@@ -331,7 +331,7 @@ class Gui extends JFrame implements View{
 
                 if (!((c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE)) && text.length() == 1) {
 
-                    focuceRight(textField);
+                    focusRight(textField);
                 }
 
             }
@@ -339,13 +339,13 @@ class Gui extends JFrame implements View{
 //            if(c == KeyEvent.VK_LEFT ){
 //                if( e.getSource() == button ) {gaps.get( gaps.size()-1).requestFocusInWindow();}
 //                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
-//                    focuceLeft( (OneSimbolTextField) e.getSource()  );
+//                    focusLeft( (OneSimbolTextField) e.getSource()  );
 //                }
 //            }
 //            if(c == KeyEvent.VK_RIGHT ){
 //                if( e.getSource() == gaps.get( gaps.size()-1) ) {button.requestFocusInWindow();}
 //                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
-//                    focuceRight( (OneSimbolTextField) e.getSource()  );
+//                    focusRight( (OneSimbolTextField) e.getSource()  );
 //                }
 //            }
 
@@ -361,10 +361,10 @@ class Gui extends JFrame implements View{
 //                OneSimbolTextField textField = (OneSimbolTextField) e.getSource();
 //
 //                if (c == KeyEvent.VK_LEFT) {
-//                    focuceLeft(textField);
+//                    focusLeft(textField);
 //                }
 //                if (c == KeyEvent.VK_RIGHT) {
-//                    focuceRight(textField);
+//                    focusRight(textField);
 //                }
 //            }
 
@@ -383,7 +383,7 @@ class Gui extends JFrame implements View{
 
         }
 
-        private void focuceRight( OneSimbolTextField textField ){
+        private void focusRight(OneSimbolTextField textField ){
 
             for (int i = 0; i < gaps.size(); i++) {
                 if (textField == gaps.get(i)) {
@@ -392,7 +392,7 @@ class Gui extends JFrame implements View{
                 }
             }
         }
-        private void focuceLeft( OneSimbolTextField textField ){
+        private void focusLeft(OneSimbolTextField textField ){
 
             for (int i = 1; i < gaps.size(); i++) {
                 if (textField == gaps.get(i)) { gaps.get(i - 1).requestFocusInWindow(); }
