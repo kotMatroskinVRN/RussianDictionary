@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.im.InputContext;
 import java.util.ArrayList;
 
 
@@ -24,25 +25,23 @@ class Gui extends JFrame implements View{
 
     private final Controller controller;
 
+
     private final Font font = new Font("Serif", Font.PLAIN, 20);
-
-    private final String HEADER  = "Словарные слова";
-    //private final JTextField    task = new JTextField(" ",10 );
     private final JTextArea textArea = new JTextArea(   "Ошибки" + " :\n\n"  );
-    private final JButton button;
-    private JPanel askPanel ;
-    private JPanel innerNorth;
-    private JLabel hintLabel ;
+    private final JButton button = new JButton("Ответ");
+    private final JPanel innerNorth;
 
-    JLabel inArow = new JLabel("0");
-    JLabel total  = new JLabel("0");
+    private final JLabel total   = new JLabel( "Верно всего : " +"0");
+    private final JLabel inArow  = new JLabel("Верно подряд : " +"0");
 
     private final ArrayList<OneSimbolTextField> gaps = new ArrayList<>();
 
+    private JPanel askPanel ;
+    private JLabel hintLabel ;
+
     private String input ;
     private String hint ;
-    private int landslide =0 , correct = 0 ;
-    private boolean isLandslide = true;
+    private int landslide = 0 , correct = 0 ;
 
     /**
      * Main constructor
@@ -53,9 +52,9 @@ class Gui extends JFrame implements View{
         this.controller = controller;
 
         // main window settings
-        setTitle(HEADER);
+        setTitle("Словарные слова");
         double RATIO = 0.5625;
-        int x = 500;
+        int x = 400;
         setBounds( 350 , 50 , x , (int)(x / RATIO)  );
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -67,7 +66,7 @@ class Gui extends JFrame implements View{
         jsp.setHorizontalScrollBar(null);
 
         // create button "Решить"
-        button = new JButton("Ответ");
+
 
         //JPanel emptyPanel = new JPanel();
 
@@ -81,7 +80,9 @@ class Gui extends JFrame implements View{
         // south status bar
         GridLayout gridLayoutSouth = new GridLayout(1,2);
         inArow.setHorizontalAlignment(JLabel.CENTER);
+        inArow.setForeground(Color.BLUE);
          total.setHorizontalAlignment(JLabel.CENTER);
+
         south.setLayout( gridLayoutSouth );
         south.add(inArow);
         south.add(total);
@@ -94,15 +95,11 @@ class Gui extends JFrame implements View{
 
         hintLabel = new JLabel(hint);
         hintLabel.setFont(font);
+        button.setFont(font);
 
         // put task and button to inner pane
-        // TODO
-        //  choose layout for task pane
-
-        //FlowLayout topLayout = new FlowLayout();
+        // new JPanel does not have BorderLayout!!! JFrame has!!!
         BorderLayout topLayout = new BorderLayout();
-        //topLayout.setAlignment(FlowLayout.RIGHT);
-
         innerNorth.setLayout( topLayout );
 
         innerNorth.add( askPanel , BorderLayout.BEFORE_LINE_BEGINS );
@@ -110,7 +107,6 @@ class Gui extends JFrame implements View{
         innerNorth.add(button , BorderLayout.LINE_END  );
 
         // fill north pane with inner pane and empty panes for margins
-
         north.setLayout( new BorderLayout() );
         north.add(innerNorth , BorderLayout.CENTER);
         north.add(new JPanel() , BorderLayout.WEST);
@@ -133,6 +129,7 @@ class Gui extends JFrame implements View{
         button.addKeyListener  ( new SwapFocusField() );
 
 
+        checkInputLanguage();
 
         // make main frame visible
         setVisible(true);
@@ -156,11 +153,6 @@ class Gui extends JFrame implements View{
 
         SwingUtilities.invokeLater( () -> showFields(false));
 
-
-
-
-
-
         //System.out.println( concatAnswer());
 
         // append text area
@@ -168,42 +160,33 @@ class Gui extends JFrame implements View{
             if (controller.action( concatAnswer() ) ){
 
                 SwingUtilities.invokeLater( () -> {
-                    total.setText(String.valueOf(++correct));
-
-                    //if(isLandslide){
-                    inArow.setText(String.valueOf(++landslide));
-                    //}
-                    //isLandslide = true;
-
+                     total.setText( "Верно всего : "  + ++correct);
+                    inArow.setText( "Верно подряд : " + ++landslide);
                     revalidate();
                 });
             }
             else{
-                //isLandslide = false;
                 landslide = 0;
                 String result = textArea.getText() + "\n" + input.replaceAll("@" , "_") ;
 
                 SwingUtilities.invokeLater( () -> {
                     textArea.setText(result);
-                    inArow.setText(String.valueOf(landslide));
+                    inArow.setText( "Верно подряд : " + landslide);
                     revalidate();
                 });
 
             }
 
             SwingUtilities.invokeLater( () -> {
-                //askPanel.removeAll();
                 innerNorth.remove(askPanel);
 
                 innerNorth.repaint();
                 input = controller.newTask();
                 askPanel = createAskPanel( input);
                 hint = controller.getHint();
-                //System.out.println("new task");
                 hintLabel.setText(hint);
 
                 innerNorth.add( askPanel ,BorderLayout.BEFORE_LINE_BEGINS);
-                //innerNorth.add(new JLabel(hint), BorderLayout.CENTER);
                 innerNorth.revalidate();
 
                 showFields(true);
@@ -221,9 +204,7 @@ class Gui extends JFrame implements View{
     private boolean isPanelFilled(){
 
         for (OneSimbolTextField field : gaps){
-
             if(field.getText().isEmpty()) return false;
-
         }
         return true;
     }
@@ -261,7 +242,6 @@ class Gui extends JFrame implements View{
 
                 OneSimbolTextField field = new OneSimbolTextField();
                 field.setFont(font);
-                //if( gaps.size()==1 ) field.requestFocusInWindow();
                 field.addKeyListener(new SwapFocusField());
                 gaps.add(field);
                 result.add(field);
@@ -276,11 +256,6 @@ class Gui extends JFrame implements View{
 
             }
         }
-
-
-        //
-        //result.revalidate();
-
 
         return result;
     }
@@ -298,6 +273,25 @@ class Gui extends JFrame implements View{
             //task.setEnabled(false);
 
         }
+    }
+
+    private void checkInputLanguage(){
+        InputContext context = InputContext.getInstance();
+        //System.out.println(context.getLocale().getCountry());
+
+        switch (context.getLocale().getCountry()){
+            case "RU":
+            case "ru":
+                button.setEnabled(true);
+                break;
+            case "EN":
+            case "US":
+            case "en":
+            case "us":
+                button.setEnabled(false);
+                break;
+        }
+
     }
 
 
@@ -329,46 +323,24 @@ class Gui extends JFrame implements View{
                 String text = textField.getText();
 
 
-                if (!((c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE)) && text.length() == 1) {
+                if (!( (c == KeyEvent.VK_BACK_SPACE) || (c == KeyEvent.VK_DELETE)) && text.length() == 1) {
 
-                    focusRight(textField);
+                    if( (c >= 'А') && (c <= 'я') ) {
+                        focusRight(textField);
+                    }
                 }
 
             }
 
-//            if(c == KeyEvent.VK_LEFT ){
-//                if( e.getSource() == button ) {gaps.get( gaps.size()-1).requestFocusInWindow();}
-//                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
-//                    focusLeft( (OneSimbolTextField) e.getSource()  );
-//                }
-//            }
-//            if(c == KeyEvent.VK_RIGHT ){
-//                if( e.getSource() == gaps.get( gaps.size()-1) ) {button.requestFocusInWindow();}
-//                if( e.getSource().getClass().isInstance(new OneSimbolTextField() )){
-//                    focusRight( (OneSimbolTextField) e.getSource()  );
-//                }
-//            }
 
+
+            Gui.this.checkInputLanguage();
 
 
         }
 
         @Override
-        public void keyPressed(KeyEvent e) {
-
-//            char c = e.getKeyChar();
-//            if( e.getSource().getClass().isInstance(  new OneSimbolTextField()) ) {
-//                OneSimbolTextField textField = (OneSimbolTextField) e.getSource();
-//
-//                if (c == KeyEvent.VK_LEFT) {
-//                    focusLeft(textField);
-//                }
-//                if (c == KeyEvent.VK_RIGHT) {
-//                    focusRight(textField);
-//                }
-//            }
-
-        }
+        public void keyPressed(KeyEvent e) { }
 
         @Override
         public void keyReleased(KeyEvent e) {

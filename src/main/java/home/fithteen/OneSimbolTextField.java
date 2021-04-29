@@ -4,9 +4,9 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class OneSimbolTextField extends JTextField {
+class OneSimbolTextField extends JTextField {
 
-    public OneSimbolTextField() {
+    OneSimbolTextField() {
         super(" ", 1);
 
         addKeyListener(new LimitEnter());
@@ -21,7 +21,8 @@ public class OneSimbolTextField extends JTextField {
         {
 
             char c = e.getKeyChar();
-            String text = ((JTextField) e.getSource()).getText();
+            //String text = ((JTextField) e.getSource()).getText();
+            String text = OneSimbolTextField.this.getText();
 
             if (!((c >= 'А') && (c <= 'я') ||
                     (c == KeyEvent.VK_BACK_SPACE) ||

@@ -29,10 +29,6 @@ public class ModelDictionary implements Model {
         //System.out.println("init");
     }
 
-//    @Override
-//    public void solve() {
-//
-//    }
 
     @Override
     public boolean checkAnswer(String string) {
@@ -67,14 +63,7 @@ public class ModelDictionary implements Model {
             //calculate average usage of words
             average = 0;
             for( int i : wordFrequency.values() ) average += (double) i / (double) wordFrequency.size();
-
-
-
         }
-
-
-
-
 
         task   = prb.getString(answer);
 
@@ -84,10 +73,9 @@ public class ModelDictionary implements Model {
         if(matcher.find()) {
             //System.out.println(matcher.group(0));
             hint = matcher.group(0)
-                    //.replaceAll("[\\(\\)]" , "")
             ;
             task = task.replaceAll( matcher.group(0) , "" )
-                    .replaceAll("[\\(\\)]" , "")
+                    .replaceAll("[()]" , "")
             ;
         }
         else hint = "";
