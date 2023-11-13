@@ -31,8 +31,8 @@ class Gui extends JFrame implements View{
     private final JButton button = new JButton("Ответ");
     private final JPanel innerNorth;
 
-    private final JLabel total   = new JLabel( "Верно всего : " +"0");
-    private final JLabel inArow  = new JLabel("Верно подряд : " +"0");
+    private final JLabel total   = new JLabel( "Верно всего : " + "0");
+    private final JLabel inArow  = new JLabel("Верно подряд : " + "0");
 
     private final ArrayList<OneSimbolTextField> gaps = new ArrayList<>();
 
@@ -102,13 +102,14 @@ class Gui extends JFrame implements View{
         BorderLayout topLayout = new BorderLayout();
         innerNorth.setLayout( topLayout );
 
-        innerNorth.add( askPanel , BorderLayout.BEFORE_LINE_BEGINS );
-        innerNorth.add( hintLabel , BorderLayout.CENTER );
-        innerNorth.add(button , BorderLayout.LINE_END  );
+        innerNorth.add( askPanel     , BorderLayout.BEFORE_LINE_BEGINS );
+        innerNorth.add( hintLabel    , BorderLayout.CENTER );
+        innerNorth.add( button       , BorderLayout.LINE_END  );
+        innerNorth.add( new JPanel() , BorderLayout.SOUTH );
 
         // fill north pane with inner pane and empty panes for margins
         north.setLayout( new BorderLayout() );
-        north.add(innerNorth , BorderLayout.CENTER);
+        north.add(innerNorth   , BorderLayout.CENTER);
         north.add(new JPanel() , BorderLayout.WEST);
         north.add(new JPanel() , BorderLayout.EAST);
         north.add(new JPanel() , BorderLayout.NORTH);
@@ -116,7 +117,7 @@ class Gui extends JFrame implements View{
 
         // put all in main frame
         add(north , BorderLayout.NORTH);
-        add(jsp, BorderLayout.CENTER);
+        add(jsp   , BorderLayout.CENTER);
         add(west  , BorderLayout.WEST);
         add(east  , BorderLayout.EAST);
         add(south , BorderLayout.SOUTH);

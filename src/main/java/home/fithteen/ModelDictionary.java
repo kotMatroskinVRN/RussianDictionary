@@ -1,6 +1,7 @@
 package home.fithteen;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,7 +33,8 @@ public class ModelDictionary implements Model {
 
     @Override
     public boolean checkAnswer(String string) {
-        return string.replaceAll("\\(.*\\)" , "").equals(answer);
+        System.out.println(string);
+        return string.replaceAll("\\(.*\\)" , "").equals(answer.replaceAll("_" , ""));
     }
     @Override
     public String getTask() { return task; }
@@ -88,7 +90,7 @@ public class ModelDictionary implements Model {
         try {
 
             InputStreamReader isr = new InputStreamReader(
-                    ClassLoader.getSystemResourceAsStream("Words.properties" ), "windows-1251"
+                    ClassLoader.getSystemResourceAsStream("Words.properties"), StandardCharsets.UTF_8
                     );
             prb = new PropertyResourceBundle( isr );
             answerSet = new ArrayList<>( prb.keySet() ) ;

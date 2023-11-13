@@ -2,15 +2,19 @@ package home.fithteen;
 
 public class ControllerGUI implements Controller{
 
-    private Model model;
+    private final Model model;
     String task , hint;
+
 
     ControllerGUI(Model model){
 
         this.model = model;
+
+
     }
     @Override
     public boolean action(final String input){
+
 
         return model.checkAnswer(input);
 
@@ -20,7 +24,7 @@ public class ControllerGUI implements Controller{
 
         model.init();
         hint = model.getHint();
-
+        task = model.getTask().replaceAll("@" , "_");
 
         return model.getTask();
     }

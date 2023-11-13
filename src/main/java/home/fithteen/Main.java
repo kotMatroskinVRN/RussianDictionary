@@ -16,12 +16,23 @@ public class Main {
 
     public static void main(String[] args) {
 
+        try {
+            // Set cross-platform Java L&F (also called "Metal")
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 
-        Model model = new ModelDictionary();
-        Controller controllerGUI = new ControllerGUI(model);
+            Model model = new ModelDictionary();
+            Controller controllerGUI = new ControllerGUI(model);
 
-        SwingUtilities.invokeLater(() -> new Gui(controllerGUI));
+            SwingUtilities.invokeLater(() -> new Gui(controllerGUI));
 
+        }
+        catch (UnsupportedLookAndFeelException
+                | ClassNotFoundException
+                | InstantiationException
+                | IllegalAccessException
+                e) {
+            e.printStackTrace();
+        }
 
     }
 }
